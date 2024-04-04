@@ -10,7 +10,7 @@
 # Review documentation to determine if you should use `theme` or `remote_theme`
 # https://mmistakes.github.io/minimal-mistakes/docs/quick-start-guide/#installing-the-theme
 
-# theme                  : "minimal-mistakes-jekyll"
+ theme                  : "minimal-mistakes-jekyll"
 # remote_theme           : "mmistakes/minimal-mistakes"
 minimal_mistakes_skin    : "dark" # "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise"
 
@@ -20,7 +20,7 @@ title                    : "Site Title"
 title_separator          : "-"
 subtitle                 : # site tagline that appears below site title in masthead
 name                     : "Samarth Agarwal"
-description              : "An amazing website."
+description              : "A data scientist and a machine learning enthusiast. I write about data science, machine learning, and artificial intelligence."
 url                      : "https://Samarth26.github.io" # the base hostname & protocol for your site
 baseurl                  : "/"
 repository               : "Samarth26/Samarth26.github.io" # GitHub repository to help with GitHub Pages deployment"
@@ -104,11 +104,11 @@ analytics:
 
 # Site Author
 author:
-  name             : "Your Name"
+  name             : "Samarth Agarwal"
   avatar           : # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
   bio              : "I am an **amazing** person."
   location         : "Somewhere"
-  email            :
+  email            : "samarthagarwal26@yahoo.com"
   links:
     - label: "Email"
       icon: "fas fa-fw fa-envelope-square"
