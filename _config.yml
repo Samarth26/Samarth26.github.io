@@ -18,7 +18,7 @@ minimal_mistakes_skin    : "dark" # "air", "aqua", "contrast", "dark", "dirt", "
 locale                   : "en-US"
 title                    : "Average Ventures"
 title_separator          : "-"
-subtitle                 : # site tagline that appears below site title in masthead
+subtitle                 : "Diary of a Data Scientist"
 name                     : "Samarth Agarwal"
 description              : "A data scientist and a machine learning enthusiast. I write about data science, machine learning, and artificial intelligence."
 url                      : "https://Samarth26.github.io" # the base hostname & protocol for your site
@@ -106,8 +106,8 @@ analytics:
 author:
   name             : "Samarth Agarwal"
   avatar           : # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
-  bio              : "I am an **amazing** person."
-  location         : "Somewhere"
+  bio              : "A data scientist and a machine learning enthusiast. I write about data science, machine learning, and artificial intelligence."
+  location         : "Singapore"
   email            : "samarthagarwal26@yahoo.com"
   links:
     - label: "Email"
