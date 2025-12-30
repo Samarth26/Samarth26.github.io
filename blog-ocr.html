@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./styles/main.css">
 </head>
+
 <body>
   <div class="page">
     <header class="site-header">
@@ -28,154 +29,220 @@
           <a href="./index.html#projects" class="back-link">← Back to projects</a>
           <h1>Agentic OCR & Email Automation</h1>
           <div class="blog-meta">
-            <span class="pill">LangChain · GPT</span>
+            <span class="pill">LangChain · LLMs</span>
             <span class="pill">OCR</span>
-            <span class="pill">Agentic AI</span>
+            <span class="pill">Agentic Validation</span>
+            <span class="pill">Streamlit</span>
           </div>
         </div>
 
         <div class="blog-post__content">
           <section>
             <h2>Overview</h2>
-            <p>Built an end-to-end agentic pipeline for freight document parsing using schema-constrained LLM inference and intelligent validation agents. The system processes complex freight documents, extracts structured data, and automatically routes emails based on confidence levels.</p>
+            <p>
+              Freight forwarding ops run on messy PDFs (often scans) and long email threads that mix multiple intents.
+              I built a modular, end-to-end agentic pipeline that combines <strong>OCR-grounded document parsing</strong> with
+              <strong>intent-aware email automation</strong>. The key idea is simple: treat every LLM output as a hypothesis that must be
+              <strong>grounded in OCR evidence</strong> and <strong>validated by agents + deterministic checks</strong> before it can be used.
+            </p>
+
+            <ul>
+              <li><strong>Workflow A (Document Intelligence):</strong> OCR → schema-constrained JSON → deterministic grounding → validation agent → visual audit</li>
+              <li><strong>Workflow B (Communication Intelligence):</strong> thread parsing → turn segmentation → intent labeling → reply drafting → safety gating</li>
+            </ul>
+
+            <p>
+              <strong>Tech stack:</strong> PaddleOCR, schema-enforced JSON extraction, string-alignment grounding,
+              validation agents, BART-MNLI (zero-shot), GPT-based labeling/judging, Streamlit UI, MongoDB.
+            </p>
           </section>
 
           <section>
             <h2>The Problem</h2>
-            <p>Freight documentation is notoriously complex—invoices, shipping manifests, and compliance forms contain unstructured layouts, handwritten notes, and variable formats. Manual processing was:</p>
+            <p>
+              Freight documents (BOLs, pre-alerts, arrival notices, invoices) are highly heterogeneous: variable layouts, stamps,
+              handwritten notes, low-quality scans, and inconsistent key fields. Email workflows add additional complexity with
+              multilingual threads and overlapping intents.
+            </p>
+
+            <p>Manual processing was:</p>
             <ul>
-              <li><strong>Error-prone:</strong> Mislabeling rates around 14.2% with Character Error Rate (CER) of 9.5%</li>
-              <li><strong>Slow:</strong> Required human review for every document</li>
-              <li><strong>Non-scalable:</strong> Couldn't handle volume spikes</li>
+              <li><strong>Error-prone:</strong> inconsistent extraction / mislabeling across templates</li>
+              <li><strong>Slow:</strong> required review for most cases</li>
+              <li><strong>Hard to scale:</strong> volume spikes created operational bottlenecks</li>
             </ul>
+
+            <p>
+              The goal wasn’t “maximum automation.” It was <strong>safe automation</strong>—only auto-process when outputs are
+              <strong>verifiable</strong>, otherwise escalate confidently.
+            </p>
           </section>
 
           <section>
             <h2>Solution Architecture</h2>
-            <p>Implemented a multi-stage agentic system:</p>
-            
-            <h3>1. OCR & Text Extraction</h3>
-            <p>Leveraged vision-language models to extract text from freight documents with integrity checks.</p>
-            
-            <h3>2. Schema-Constrained LLM Inference</h3>
-            <p>Used LangChain with GPT-4 to extract structured fields (shipper, receiver, weight, date) constrained to predefined schemas to prevent hallucinations.</p>
-            
-            <h3>3. Validation Agents</h3>
-            <p>Multi-agent system that:</p>
-            <ul>
-              <li>Cross-validates extracted fields against business rules</li>
-              <li>Detects inconsistencies and flags for human review</li>
-              <li>Implements safety-aware abstention to know when confidence is too low</li>
-            </ul>
-            
-            <h3>4. Intent Classification & Routing</h3>
-            <p>Classifies emails into three buckets:</p>
-            <ul>
-              <li><strong>Ready-to-send (70%):</strong> High confidence, auto-processed</li>
-              <li><strong>Hallucination detected (8%):</strong> LLM confidence vs validation mismatch</li>
-              <li><strong>Escalation needed (19%):</strong> Complex cases requiring human judgment</li>
-            </ul>
+
+            <h3>Workflow A: Document Intelligence</h3>
+            <ol>
+              <li>
+                <strong>OCR extraction:</strong> PaddleOCR extracts text + bounding boxes + confidence scores.
+                Tokens are grouped into stable spatial blocks for downstream grounding.
+              </li>
+              <li>
+                <strong>Schema-constrained JSON parsing:</strong> an LLM extracts required fields into a strict schema
+                (types/keys enforced to reduce structural hallucinations).
+              </li>
+              <li>
+                <strong>Deterministic OCR grounding:</strong> map extracted JSON values back to OCR evidence using
+                exact match → substring → partial token overlap.
+              </li>
+              <li>
+                <strong>Validation agent:</strong> focus on high-risk identifiers (e.g., shipment numbers).
+                Replace/repair fields only if an OCR-backed match exists (substring + edit-distance similarity).
+              </li>
+              <li>
+                <strong>Storage + audit:</strong> store outputs + QA signals in MongoDB and expose a Streamlit visual reviewer.
+              </li>
+            </ol>
+
+            <h3>Workflow B: Communication Intelligence</h3>
+            <ol>
+              <li>
+                <strong>Email parsing + segmentation:</strong> convert <code>.eml</code> into structured turns,
+                strip signatures/disclaimers, and split threads using robust reply separators (including multilingual).
+              </li>
+              <li>
+                <strong>Intent labeling:</strong> classify segments into operational buckets (e.g., Pre-alert, Arrival Notice,
+                Terminal Release, Trucking) using a blend of rules, zero-shot NLI, and LLM labeling with evidence quotes.
+              </li>
+              <li>
+                <strong>Reply drafting + safety gating:</strong> generate replies from structured inputs and enforce constraints:
+                do not introduce shipment IDs/dates/statuses/amounts unless present in the thread/document context.
+              </li>
+              <li>
+                <strong>Independent judge:</strong> an LLM-as-a-judge evaluates completeness + tone + sendability,
+                but deterministic checks override approval.
+              </li>
+            </ol>
+
+            <!-- Optional: add architecture images (keep your CSS)
+                 Replace src with your actual paths -->
+            <!--
+            <figure>
+              <img src="./assets/workflow-a.png" alt="Workflow A diagram" style="width:100%;border-radius:12px;">
+              <figcaption>Workflow A: Document Intelligence</figcaption>
+            </figure>
+            <figure>
+              <img src="./assets/workflow-b.png" alt="Workflow B diagram" style="width:100%;border-radius:12px;">
+              <figcaption>Workflow B: Communication Intelligence</figcaption>
+            </figure>
+            -->
           </section>
 
           <section>
             <h2>Results</h2>
+
+            <p>
+              The biggest gains came from pairing <strong>schema constraints</strong> with <strong>deterministic grounding</strong>
+              and a <strong>targeted validation agent</strong> for high-risk fields.
+            </p>
+
             <table class="results-table">
               <tr>
-                <th>Metric</th>
-                <th>Before</th>
-                <th>After</th>
-                <th>Improvement</th>
+                <th>Configuration</th>
+                <th>Mislabel Rate</th>
+                <th>CER</th>
               </tr>
               <tr>
-                <td>Mislabel Rate</td>
+                <td>Flexible prompt (no strict schema)</td>
                 <td>14.2%</td>
-                <td>1.8%</td>
-                <td>↓ 87.3%</td>
-              </tr>
-              <tr>
-                <td>Character Error Rate (CER)</td>
                 <td>9.5%</td>
-                <td>2.5%</td>
-                <td>↓ 73.7%</td>
               </tr>
               <tr>
-                <td>Auto-processing Rate</td>
-                <td>0%</td>
-                <td>70%</td>
-                <td>+70%</td>
+                <td>Strict schema + alignment (no validation agent)</td>
+                <td>5.4%</td>
+                <td>4.8%</td>
+              </tr>
+              <tr>
+                <td><strong>Strict schema + alignment + validation agent</strong></td>
+                <td><strong>1.8%</strong></td>
+                <td><strong>2.5%</strong></td>
               </tr>
             </table>
+
+            <p>
+              On the communication side, the system explicitly separates “safe to automate” from “needs review.”
+              The pipeline produced three operational buckets:
+            </p>
+            <ul>
+              <li><strong>Ready-to-send (≈70%):</strong> high confidence + passes deterministic constraints</li>
+              <li><strong>Hallucination detected (≈8%):</strong> unsafe additions (IDs/dates/status/amount) or validation mismatch</li>
+              <li><strong>Escalation needed (≈19%):</strong> ambiguous / multi-intent / missing information → human-in-the-loop</li>
+            </ul>
           </section>
 
           <section>
             <h2>Key Technical Insights</h2>
             <ul>
-              <li><strong>Schema Constraints Matter:</strong> JSON schema enforcement reduced hallucinations by ensuring LLM output conforms to expected structure</li>
-              <li><strong>Multi-Agent Consensus:</strong> Independent validation agents catching edge cases that single-pass extraction would miss</li>
-              <li><strong>Know When to Abstain:</strong> The 19% escalation rate is intentional—safety > automation</li>
-              <li><strong>Iterative Refinement:</strong> Used misclassified documents to improve prompts and validation rules</li>
+              <li>
+                <strong>Schema constraints matter:</strong> forcing a strict JSON contract reduces structural errors and makes validation easier.
+              </li>
+              <li>
+                <strong>Grounding beats “LLM reasoning” over boxes:</strong> deterministic string alignment to OCR evidence was more reliable in practice.
+              </li>
+              <li>
+                <strong>Agents should be narrow:</strong> validation agents focused on high-risk identifiers delivered the best ROI.
+              </li>
+              <li>
+                <strong>Abstention is a feature:</strong> the escalation bucket is intentional—safety &gt; automation in ops workflows.
+              </li>
+              <li>
+                <strong>Judge ≠ authority:</strong> the judge helps scale evaluation, but deterministic constraints must override.
+              </li>
             </ul>
           </section>
 
           <section>
-            <h2>Interactive Streamlit Viewer Application</h2>
-            <p>To make document inspection intuitive and visual, I built a Streamlit web application that provides:</p>
-            
+            <h2>Interactive Streamlit Viewer</h2>
+            <p>
+              To make verification fast, I built a Streamlit app that lets operators visually audit OCR and extracted fields.
+            </p>
+
             <h3>Core Features</h3>
             <ul>
-              <li><strong>Document Browser:</strong> Select from processed documents stored in the pipeline</li>
-              <li><strong>Image Display:</strong> View original PDFs/images rendered directly in the browser</li>
-              <li><strong>Interactive OCR Overlay:</strong> Hover over detected text regions to see:
-                <ul>
-                  <li>Extracted text content</li>
-                  <li>OCR confidence scores with color-coded indicators (green=high confidence, red=low confidence)</li>
-                  <li>Zoomed thumbnails of each detected region for verification</li>
-                </ul>
-              </li>
-              <li><strong>Parsed Labels Overlay:</strong> View AI-extracted structured data overlaid directly on the document</li>
-              <li><strong>JSON Inspector:</strong> Review the complete parsed JSON output in the sidebar</li>
-              <li><strong>File Management:</strong> Select from available processed documents and manually override file selection</li>
+              <li><strong>Document browser:</strong> select processed docs from the pipeline</li>
+              <li><strong>Rendered PDF/image viewer:</strong> view the original content in-browser</li>
+              <li><strong>OCR overlay:</strong> hover to inspect extracted text + confidence (color-coded)</li>
+              <li><strong>Parsed field overlay:</strong> show structured fields mapped back to document regions</li>
+              <li><strong>JSON inspector:</strong> review the complete parsed JSON in the sidebar</li>
             </ul>
 
-            <h3>Technical Implementation</h3>
-            <p>The app uses:</p>
+            <h3>Implementation Notes</h3>
             <ul>
-              <li><strong>Streamlit:</strong> Web framework for quick interactive dashboards</li>
-              <li><strong>PIL/Pillow:</strong> Image processing and dynamic thumbnail generation</li>
-              <li><strong>Custom HTML/CSS:</strong> Interactive overlays with hover effects and zoom functionality</li>
-              <li><strong>Base64 Encoding:</strong> Efficient image transmission to browser</li>
+              <li><strong>Streamlit:</strong> interactive UI scaffolding</li>
+              <li><strong>PIL/Pillow:</strong> thumbnails + image transforms</li>
+              <li><strong>Custom HTML/CSS overlays:</strong> hover tooltips + zoomed regions</li>
+              <li><strong>Base64 images:</strong> efficient in-browser rendering</li>
             </ul>
-
-            <h3>User Workflow</h3>
-            <ol>
-              <li>User navigates to the app and selects a document from the email processing pipeline</li>
-              <li>Original image loads in the main viewer area</li>
-              <li>Two overlay systems display simultaneously:
-                <ol type="a">
-                  <li>OCR blocks overlay showing raw text extraction</li>
-                  <li>Parsed labels overlay showing structured AI extraction</li>
-                </ol>
-              </li>
-              <li>Hovering over any region shows:
-                <ul>
-                  <li>Enlarged label text (16px, bold)</li>
-                  <li>240px wide zoomed thumbnail with context</li>
-                </ul>
-              </li>
-              <li>Sidebar displays complete JSON for programmatic inspection</li>
-            </ol>
           </section>
 
           <section>
             <h2>Takeaways</h2>
-            <p>This project demonstrates that agentic systems work best when:</p>
+            <p>This project reinforced a practical recipe for agentic automation in high-stakes workflows:</p>
             <ul>
-              <li>You combine multiple weak signals (OCR, LLM, validation rules)</li>
-              <li>You're explicit about uncertainty and abstention thresholds</li>
-              <li>You validate against ground truth, not just LLM confidence</li>
-              <li>You leave room for humans in high-stakes decisions</li>
-              <li>You provide tools for humans to inspect and verify the system's work</li>
+              <li>Combine multiple weak signals (OCR, LLM, rules) into a stronger system</li>
+              <li>Force verifiability via grounding and schema contracts</li>
+              <li>Make uncertainty explicit (abstain + escalate)</li>
+              <li>Keep humans in the loop for ambiguous or high-impact cases</li>
+              <li>Give operators tooling (visual audits) instead of blind trust</li>
             </ul>
+
+            <!-- Optional link section -->
+            <p>
+              <strong>Links:</strong>
+              <a href="#" onclick="alert('Replace with your repo/demo/report URLs'); return false;">Repo</a> ·
+              <a href="#" onclick="alert('Replace with your repo/demo/report URLs'); return false;">Demo</a> ·
+              <a href="#" onclick="alert('Replace with your repo/demo/report URLs'); return false;">Report</a>
+            </p>
           </section>
         </div>
 
