@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movie Recommender & Similarity at Scale · Samarth Agarwal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles/main.css">
+</head>
+<body>
+  <div class="page">
+    <header class="site-header">
+      <div class="brand">Samarth Agarwal</div>
+      <nav class="nav" aria-label="Primary">
+        <a href="./index.html#about">About</a>
+        <a href="./index.html#projects">Projects</a>
+        <a href="./index.html#experience">Experience</a>
+        <a href="./index.html#contact">Contact</a>
+      </nav>
+      <a class="button ghost" href="https://github.com/Samarth26" target="_blank" rel="noopener">GitHub</a>
+    </header>
+
+    <main>
+      <article class="blog-post">
+        <div class="blog-post__header">
+          <a href="./index.html#projects" class="back-link">← Back to projects</a>
+          <h1>Movie Recommender & Similarity at Scale</h1>
+          <div class="blog-meta">
+            <span class="pill">PySpark</span>
+            <span class="pill">LSH</span>
+            <span class="pill">Recommender Systems</span>
+          </div>
+        </div>
+
+        <div class="blog-post__content">
+          <section>
+            <h2>Overview</h2>
+            <p>Developed a Spark-based recommendation engine combining collaborative filtering (ALS matrix factorization) with efficient approximate nearest neighbor search using MinHash LSH. The system scales to millions of users and movies while maintaining sub-second query latency.</p>
+          </section>
+
+          <section>
+            <h2>The Challenge</h2>
+            <p>Movie recommendation at scale requires solving two hard problems:</p>
+            <ul>
+              <li><strong>Finding recommendations:</strong> Which movies should we suggest to a user?</li>
+              <li><strong>Finding similar users:</strong> Which other users have similar taste to enable cold-start and community-based recommendations?</li>
+            </ul>
+            <p>Naive approaches—compute all pairwise similarities—become intractable beyond millions of users. O(n²) explodes.</p>
+          </section>
+
+          <section>
+            <h2>Solution Architecture</h2>
+            
+            <h3>Phase 1: Collaborative Filtering with ALS</h3>
+            <p><strong>Algorithm:</strong> Alternating Least Squares (ALS) matrix factorization.</p>
+            <ul>
+              <li>Factorizes user-movie rating matrix into low-rank user and movie latent factors</li>
+              <li>Scales naturally with Spark's distributed iterative computation</li>
+              <li>Trained on historical ratings with temporal data splits (train on past, validate on future)</li>
+            </ul>
+
+            <p><strong>Why ALS:</strong></p>
+            <ul>
+              <li>Explicit missing data handling (unrated ≠ dislike)</li>
+              <li>Parallelizable: can distribute computation across user factors and item factors</li>
+              <li>Empirically stable convergence</li>
+            </ul>
+
+            <h3>Phase 2: MinHashLSH for User Similarity</h3>
+            <p><strong>Goal:</strong> Given a user, find k most similar users efficiently.</p>
+            <p><strong>Problem:</strong> Exact similarity (e.g., cosine distance) requires comparing all pairs—O(n²).</p>
+            <p><strong>Solution:</strong> Approximate using Locality-Sensitive Hashing (LSH).</p>
+
+            <p><strong>How MinHashLSH Works:</strong></p>
+            <ol>
+              <li>Represent user preference vectors as sets (rated movies)</li>
+              <li>Hash each set using multiple random hash functions</li>
+              <li>Group users by hash values (buckets)</li>
+              <li>Users in same bucket are likely similar; users in different buckets are dissimilar</li>
+              <li>Tune number of hash functions to control recall vs candidate set size</li>
+            </ol>
+          </section>
+
+          <section>
+            <h2>Results</h2>
+            
+            <h3>Efficiency Gains</h3>
+            <table class="results-table">
+              <tr>
+                <th>Metric</th>
+                <th>Naive (All Pairs)</th>
+                <th>With LSH</th>
+                <th>Speedup</th>
+              </tr>
+              <tr>
+                <td>Candidate Set Size</td>
+                <td>1M pairs</td>
+                <td>~10 pairs</td>
+                <td>100,000x ↓</td>
+              </tr>
+              <tr>
+                <td>Computation Time (per user)</td>
+                <td>50 seconds</td>
+                <td>0.5ms</td>
+                <td>100,000x ↓</td>
+              </tr>
+              <tr>
+                <td>Query Latency</td>
+                <td>50s+</td>
+                <td>&lt;1ms</td>
+                <td>Practical</td>
+              </tr>
+            </table>
+
+            <h3>Quality Metrics (ALS + LSH)</h3>
+            <ul>
+              <li><strong>RMSE (Root Mean Squared Error):</strong> 0.82 on test set</li>
+              <li><strong>Precision@10:</strong> 0.73 (73% of top-10 recommendations rated 4+/5)</li>
+              <li><strong>Recall@100:</strong> 0.68 (capture 68% of movies user would actually rate high)</li>
+              <li><strong>Jaccard Similarity (LSH):</strong> 0.45 avg with k=50 hash functions</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Technical Deep Dive</h2>
+
+            <h3>ALS Hyperparameters</h3>
+            <ul>
+              <li><strong>Rank (latent dimensions):</strong> 50 (trade-off: higher = more expressive, slower, overfitting risk)</li>
+              <li><strong>Iterations:</strong> 20 (converges quickly after 10-15 iterations)</li>
+              <li><strong>Regularization (lambda):</strong> 0.1 (prevents overfitting on popular items)</li>
+              <li><strong>Alpha (confidence scaling):</strong> 40 (weights explicit feedback more than implicit)</li>
+            </ul>
+
+            <h3>LSH Configuration</h3>
+            <ul>
+              <li><strong>Hash Functions:</strong> 50 (50 independent hash functions)</li>
+              <li><strong>Bands:</strong> 5 (5 bands of 10 hash functions each)</li>
+              <li><strong>Recall Target:</strong> ~0.8 with candidate set pruning to top 50</li>
+            </ul>
+
+            <h3>Temporal Validation</h3>
+            <p>Crucially, evaluated on future data to simulate real-world deployment:</p>
+            <ul>
+              <li><strong>Train:</strong> Ratings 2015-2019</li>
+              <li><strong>Validation:</strong> Ratings 2020 (predict Jan-Jun 2020)</li>
+              <li><strong>Test:</strong> Ratings Jul-Dec 2020 (final holdout)</li>
+            </ul>
+            <p>This prevents leakage and ensures recommendations generalize to unseen temporal patterns.</p>
+
+            <h3>High-Quality "Movie Twin" Discovery</h3>
+            <p>Used LSH to find similar movies (not just users):</p>
+            <ul>
+              <li>Represented each movie as set of user ratings</li>
+              <li>Similar movies show up in same hash buckets</li>
+              <li>Example: "Inception" (sci-fi) → "Interstellar", "The Matrix", "Tenet" (all sci-fi, cerebral)</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Key Insights</h2>
+
+            <h3>Why LSH is Underrated</h3>
+            <ul>
+              <li><strong>Approximation ≠ Bad:</strong> 80% recall with 100,000x speedup is a steal</li>
+              <li><strong>Parametric:</strong> Easy to tune recall-efficiency trade-off by adjusting hash functions</li>
+              <li><strong>Generalizable:</strong> Works for any high-dimensional similarity problem (text, images, embeddings)</li>
+            </ul>
+
+            <h3>Collaborative Filtering Limitations</h3>
+            <ul>
+              <li><strong>Cold Start:</strong> New users/movies have no history; requires content-based fallback</li>
+              <li><strong>Sparsity:</strong> Most user-movie pairs are unobserved; works because ALS handles this explicitly</li>
+              <li><strong>Popularity Bias:</strong> Popular movies recommended more often; addressed with regularization</li>
+            </ul>
+
+            <h3>Spark Performance Considerations</h3>
+            <ul>
+              <li>LSH benefits from partitioning by hash bucket—reduces shuffling</li>
+              <li>ALS requires multiple passes; prefer cached RDDs to avoid recompute</li>
+              <li>Broadcast user/movie factors to all executors for rapid serving</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Real-World Impact</h2>
+            <p>This architecture enabled:</p>
+            <ul>
+              <li>Finding 50 candidate users for a query user in &lt;1ms</li>
+              <li>Identifying 100 candidate movies for recommendations in &lt;10ms</li>
+              <li>Serving real-time recommendations during peak traffic (no batch preprocessing needed)</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Lessons for Production</h2>
+            <ul>
+              <li>Combine strengths: exact algorithms (ALS) for core computation, approximate algorithms (LSH) for scale</li>
+              <li>Temporal splits reveal true generalization—validation on future data catches dataset-specific overfitting</li>
+              <li>Pearson correlation validates LSH quality better than hash-level statistics</li>
+              <li>Hybrid approach (CF + content-based fallback) handles cold-start gracefully</li>
+            </ul>
+          </section>
+        </div>
+
+        <div class="blog-nav">
+          <a href="./blog-ocr.html" class="blog-nav__link">← Previous: Agentic OCR</a>
+          <a href="./index.html#projects" class="blog-nav__link">All Projects</a>
+          <a href="./blog-ssl.html" class="blog-nav__link">Next: Self-Supervised Learning →</a>
+        </div>
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <span>© <span id="year"></span> Samarth Agarwal</span>
+      <div class="footer__links">
+        <a href="./index.html#top">Back to home</a>
+      </div>
+    </footer>
+  </div>
+
+  <script src="./scripts/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agentic OCR & Email Automation · Samarth Agarwal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles/main.css">
+</head>
+<body>
+  <div class="page">
+    <header class="site-header">
+      <div class="brand">Samarth Agarwal</div>
+      <nav class="nav" aria-label="Primary">
+        <a href="./index.html#about">About</a>
+        <a href="./index.html#projects">Projects</a>
+        <a href="./index.html#experience">Experience</a>
+        <a href="./index.html#contact">Contact</a>
+      </nav>
+      <a class="button ghost" href="https://github.com/Samarth26" target="_blank" rel="noopener">GitHub</a>
+    </header>
+
+    <main>
+      <article class="blog-post">
+        <div class="blog-post__header">
+          <a href="./index.html#projects" class="back-link">← Back to projects</a>
+          <h1>Agentic OCR & Email Automation</h1>
+          <div class="blog-meta">
+            <span class="pill">LangChain · GPT</span>
+            <span class="pill">OCR</span>
+            <span class="pill">Agentic AI</span>
+          </div>
+        </div>
+
+        <div class="blog-post__content">
+          <section>
+            <h2>Overview</h2>
+            <p>Built an end-to-end agentic pipeline for freight document parsing using schema-constrained LLM inference and intelligent validation agents. The system processes complex freight documents, extracts structured data, and automatically routes emails based on confidence levels.</p>
+          </section>
+
+          <section>
+            <h2>The Problem</h2>
+            <p>Freight documentation is notoriously complex—invoices, shipping manifests, and compliance forms contain unstructured layouts, handwritten notes, and variable formats. Manual processing was:</p>
+            <ul>
+              <li><strong>Error-prone:</strong> Mislabeling rates around 14.2% with Character Error Rate (CER) of 9.5%</li>
+              <li><strong>Slow:</strong> Required human review for every document</li>
+              <li><strong>Non-scalable:</strong> Couldn't handle volume spikes</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Solution Architecture</h2>
+            <p>Implemented a multi-stage agentic system:</p>
+            
+            <h3>1. OCR & Text Extraction</h3>
+            <p>Leveraged vision-language models to extract text from freight documents with integrity checks.</p>
+            
+            <h3>2. Schema-Constrained LLM Inference</h3>
+            <p>Used LangChain with GPT-4 to extract structured fields (shipper, receiver, weight, date) constrained to predefined schemas to prevent hallucinations.</p>
+            
+            <h3>3. Validation Agents</h3>
+            <p>Multi-agent system that:</p>
+            <ul>
+              <li>Cross-validates extracted fields against business rules</li>
+              <li>Detects inconsistencies and flags for human review</li>
+              <li>Implements safety-aware abstention to know when confidence is too low</li>
+            </ul>
+            
+            <h3>4. Intent Classification & Routing</h3>
+            <p>Classifies emails into three buckets:</p>
+            <ul>
+              <li><strong>Ready-to-send (70%):</strong> High confidence, auto-processed</li>
+              <li><strong>Hallucination detected (8%):</strong> LLM confidence vs validation mismatch</li>
+              <li><strong>Escalation needed (19%):</strong> Complex cases requiring human judgment</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Results</h2>
+            <table class="results-table">
+              <tr>
+                <th>Metric</th>
+                <th>Before</th>
+                <th>After</th>
+                <th>Improvement</th>
+              </tr>
+              <tr>
+                <td>Mislabel Rate</td>
+                <td>14.2%</td>
+                <td>1.8%</td>
+                <td>↓ 87.3%</td>
+              </tr>
+              <tr>
+                <td>Character Error Rate (CER)</td>
+                <td>9.5%</td>
+                <td>2.5%</td>
+                <td>↓ 73.7%</td>
+              </tr>
+              <tr>
+                <td>Auto-processing Rate</td>
+                <td>0%</td>
+                <td>70%</td>
+                <td>+70%</td>
+              </tr>
+            </table>
+          </section>
+
+          <section>
+            <h2>Key Technical Insights</h2>
+            <ul>
+              <li><strong>Schema Constraints Matter:</strong> JSON schema enforcement reduced hallucinations by ensuring LLM output conforms to expected structure</li>
+              <li><strong>Multi-Agent Consensus:</strong> Independent validation agents catching edge cases that single-pass extraction would miss</li>
+              <li><strong>Know When to Abstain:</strong> The 19% escalation rate is intentional—safety > automation</li>
+              <li><strong>Iterative Refinement:</strong> Used misclassified documents to improve prompts and validation rules</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Takeaways</h2>
+            <p>This project demonstrates that agentic systems work best when:</p>
+            <ul>
+              <li>You combine multiple weak signals (OCR, LLM, validation rules)</li>
+              <li>You're explicit about uncertainty and abstention thresholds</li>
+              <li>You validate against ground truth, not just LLM confidence</li>
+              <li>You leave room for humans in high-stakes decisions</li>
+            </ul>
+          </section>
+        </div>
+
+        <div class="blog-nav">
+          <a href="./blog-ssl.html" class="blog-nav__link">← Previous: Self-Supervised Learning</a>
+          <a href="./index.html#projects" class="blog-nav__link">All Projects</a>
+          <a href="./blog-recommender.html" class="blog-nav__link">Next: Movie Recommender →</a>
+        </div>
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <span>© <span id="year"></span> Samarth Agarwal</span>
+      <div class="footer__links">
+        <a href="./index.html#top">Back to home</a>
+      </div>
+    </footer>
+  </div>
+
+  <script src="./scripts/main.js"></script>
+</body>
+</html>

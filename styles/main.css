@@ -275,6 +275,141 @@ a:hover {
   margin-left: 12px;
 }
 
+/* Blog Post Styles */
+.blog-post {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.blog-post__header {
+  margin-bottom: 40px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent-2);
+  font-weight: 600;
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.back-link:hover {
+  background: rgba(93, 224, 230, 0.1);
+}
+
+.blog-post__header h1 {
+  font-size: 42px;
+  line-height: 1.1;
+  margin: 12px 0 16px;
+}
+
+.blog-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.blog-post__content {
+  line-height: 1.8;
+}
+
+.blog-post__content section {
+  margin-bottom: 32px;
+}
+
+.blog-post__content h2 {
+  font-size: 28px;
+  margin-top: 28px;
+  margin-bottom: 12px;
+  color: var(--accent);
+}
+
+.blog-post__content h3 {
+  font-size: 18px;
+  margin-top: 16px;
+  margin-bottom: 8px;
+}
+
+.blog-post__content p {
+  margin: 8px 0;
+  color: var(--muted);
+}
+
+.blog-post__content ul,
+.blog-post__content ol {
+  margin: 12px 0;
+  padding-left: 24px;
+  color: var(--muted);
+}
+
+.blog-post__content li {
+  margin: 8px 0;
+}
+
+.blog-post__content strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.results-table th,
+.results-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.results-table th {
+  background: rgba(93, 224, 230, 0.1);
+  font-weight: 700;
+  color: var(--accent-2);
+}
+
+.results-table tr:last-child td {
+  border-bottom: none;
+}
+
+.results-table td {
+  color: var(--muted);
+}
+
+.blog-nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.blog-nav__link {
+  display: inline-flex;
+  align-items: center;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  color: var(--accent);
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.blog-nav__link:hover {
+  background: rgba(243, 167, 18, 0.1);
+  border-color: var(--accent);
+}
+
 @media (max-width: 900px) {
   .site-header {
     grid-template-columns: 1fr;

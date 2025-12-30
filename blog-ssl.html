@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Self-Supervised Representation Learning · Samarth Agarwal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles/main.css">
+</head>
+<body>
+  <div class="page">
+    <header class="site-header">
+      <div class="brand">Samarth Agarwal</div>
+      <nav class="nav" aria-label="Primary">
+        <a href="./index.html#about">About</a>
+        <a href="./index.html#projects">Projects</a>
+        <a href="./index.html#experience">Experience</a>
+        <a href="./index.html#contact">Contact</a>
+      </nav>
+      <a class="button ghost" href="https://github.com/Samarth26" target="_blank" rel="noopener">GitHub</a>
+    </header>
+
+    <main>
+      <article class="blog-post">
+        <div class="blog-post__header">
+          <a href="./index.html#projects" class="back-link">← Back to projects</a>
+          <h1>Self-Supervised Representation Learning</h1>
+          <div class="blog-meta">
+            <span class="pill">PyTorch</span>
+            <span class="pill">Self-Supervised Learning</span>
+            <span class="pill">Computer Vision</span>
+          </div>
+        </div>
+
+        <div class="blog-post__content">
+          <section>
+            <h2>Overview</h2>
+            <p>Trained ResNet-101 from scratch using three self-supervised learning methods (SimCLR, BYOL, and MoCo) on 600k+ unlabeled images. The goal: understand which SSL algorithm converges fastest and most stably under constrained compute resources.</p>
+          </section>
+
+          <section>
+            <h2>Motivation</h2>
+            <p>Self-supervised learning is powerful—it learns meaningful representations without labels. But in practice:</p>
+            <ul>
+              <li>Different SSL algorithms have different convergence properties</li>
+              <li>Compute constraints force trade-offs between method sophistication and training time</li>
+              <li>Transfer performance on downstream tasks matters more than pretraining accuracy</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Methods Compared</h2>
+            
+            <h3>SimCLR (Simple Contrastive Learning)</h3>
+            <p><strong>Approach:</strong> Maximizes agreement between augmented views of the same image using contrastive loss.</p>
+            <ul>
+              <li>Pro: Simple, interpretable, well-studied</li>
+              <li>Con: Large batch sizes required for good contrastive negatives</li>
+            </ul>
+
+            <h3>BYOL (Bootstrap Your Own Latent)</h3>
+            <p><strong>Approach:</strong> No explicit negative samples—uses momentum encoder and prediction head.</p>
+            <ul>
+              <li>Pro: Smaller batch requirements, stable training</li>
+              <li>Con: Less intuitive, can be prone to collapse without careful tuning</li>
+            </ul>
+
+            <h3>MoCo (Momentum Contrast)</h3>
+            <p><strong>Approach:</strong> Maintains a queue of negative samples, momentum-updated encoder.</p>
+            <ul>
+              <li>Pro: Best of both worlds—stable with reasonable batch sizes</li>
+              <li>Con: More hyperparameters to tune</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Experimental Setup</h2>
+            <ul>
+              <li><strong>Dataset:</strong> 600k+ unlabeled images (ImageNet + additional data)</li>
+              <li><strong>Architecture:</strong> ResNet-101 backbone</li>
+              <li><strong>Training:</strong> 800 epochs (aggressive schedule to match compute constraints)</li>
+              <li><strong>Downstream Eval:</strong> Linear evaluation on mini-ImageNet (1000 images per class) and CUB-200 (bird classification, fine-grained)</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Results</h2>
+            
+            <h3>Training Convergence</h3>
+            <table class="results-table">
+              <tr>
+                <th>Method</th>
+                <th>Convergence Speed</th>
+                <th>Stability</th>
+                <th>Final Loss</th>
+              </tr>
+              <tr>
+                <td>SimCLR</td>
+                <td>Moderate</td>
+                <td>Stable</td>
+                <td>0.42</td>
+              </tr>
+              <tr>
+                <td>BYOL</td>
+                <td>Fast</td>
+                <td>Variable</td>
+                <td>0.38</td>
+              </tr>
+              <tr>
+                <td>MoCo</td>
+                <td>Moderate</td>
+                <td>Most Stable</td>
+                <td>0.35</td>
+              </tr>
+            </table>
+
+            <h3>Transfer Performance (Frozen Encoder)</h3>
+            <table class="results-table">
+              <tr>
+                <th>Method</th>
+                <th>mini-ImageNet (Top-1)</th>
+                <th>CUB-200 (Top-1)</th>
+              </tr>
+              <tr>
+                <td>SimCLR</td>
+                <td>58.2%</td>
+                <td>32.1%</td>
+              </tr>
+              <tr>
+                <td>BYOL</td>
+                <td>57.8%</td>
+                <td>31.9%</td>
+              </tr>
+              <tr>
+                <td>MoCo</td>
+                <td>59.9%</td>
+                <td>34.5%</td>
+              </tr>
+            </table>
+
+            <p><strong>Key Finding:</strong> MoCo achieved best transfer performance and most stable training—the momentum-based negative queue elegantly balances stability with efficiency.</p>
+          </section>
+
+          <section>
+            <h2>Technical Details</h2>
+            
+            <h3>Data Augmentation Pipeline</h3>
+            <p>Critical to SSL success. Used:</p>
+            <ul>
+              <li>Random crops (70-100% of image)</li>
+              <li>Color jittering, Gaussian blur</li>
+              <li>Random flips</li>
+            </ul>
+
+            <h3>Hyperparameter Tuning</h3>
+            <ul>
+              <li>Learning rate: 0.03 (scaled by batch size)</li>
+              <li>Batch size: 256</li>
+              <li>Temperature (τ): 0.07 for SimCLR, 0.07 for MoCo</li>
+              <li>Momentum coefficient (μ): 0.999 for MoCo and BYOL</li>
+            </ul>
+
+            <h3>Ablation: Impact of Queue Size (MoCo)</h3>
+            <p>Queue size affects negative sample diversity:</p>
+            <ul>
+              <li>Queue size 4096: Fast but unstable (loss jumps)</li>
+              <li>Queue size 65536: Sweet spot—balanced convergence</li>
+              <li>Queue size 262144: Better final accuracy but slower convergence</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Why MoCo Won for This Task</h2>
+            <ul>
+              <li><strong>Compute Efficiency:</strong> Momentum queue reduces memory overhead vs maintaining full negative sample matrix</li>
+              <li><strong>Stability:</strong> Momentum-updated encoder smooths training dynamics; fewer training instabilities</li>
+              <li><strong>Better Transfer:</strong> Frozen encoder evaluation on fine-grained tasks (CUB-200) showed MoCo's learned representations captured richer visual features</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Lessons Learned</h2>
+            <ul>
+              <li>SSL isn't one-size-fits-all: task and compute constraints matter</li>
+              <li>Transfer learning evaluation on diverse downstream tasks (generic vs fine-grained) reveals method robustness</li>
+              <li>Momentum mechanisms are underrated—they smooth optimization in ways explicit methods can't</li>
+              <li>Ablations on queue size/batch size teach more than final numbers alone</li>
+            </ul>
+          </section>
+        </div>
+
+        <div class="blog-nav">
+          <a href="./blog-recommender.html" class="blog-nav__link">← Previous: Movie Recommender</a>
+          <a href="./index.html#projects" class="blog-nav__link">All Projects</a>
+          <a href="./blog-ocr.html" class="blog-nav__link">Next: Agentic OCR →</a>
+        </div>
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <span>© <span id="year"></span> Samarth Agarwal</span>
+      <div class="footer__links">
+        <a href="./index.html#top">Back to home</a>
+      </div>
+    </footer>
+  </div>
+
+  <script src="./scripts/main.js"></script>
+</body>
+</html>
