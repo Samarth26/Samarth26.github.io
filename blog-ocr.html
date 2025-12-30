@@ -118,6 +118,55 @@
           </section>
 
           <section>
+            <h2>Interactive Streamlit Viewer Application</h2>
+            <p>To make document inspection intuitive and visual, I built a Streamlit web application that provides:</p>
+            
+            <h3>Core Features</h3>
+            <ul>
+              <li><strong>Document Browser:</strong> Select from processed documents stored in the pipeline</li>
+              <li><strong>Image Display:</strong> View original PDFs/images rendered directly in the browser</li>
+              <li><strong>Interactive OCR Overlay:</strong> Hover over detected text regions to see:
+                <ul>
+                  <li>Extracted text content</li>
+                  <li>OCR confidence scores with color-coded indicators (green=high confidence, red=low confidence)</li>
+                  <li>Zoomed thumbnails of each detected region for verification</li>
+                </ul>
+              </li>
+              <li><strong>Parsed Labels Overlay:</strong> View AI-extracted structured data overlaid directly on the document</li>
+              <li><strong>JSON Inspector:</strong> Review the complete parsed JSON output in the sidebar</li>
+              <li><strong>File Management:</strong> Select from available processed documents and manually override file selection</li>
+            </ul>
+
+            <h3>Technical Implementation</h3>
+            <p>The app uses:</p>
+            <ul>
+              <li><strong>Streamlit:</strong> Web framework for quick interactive dashboards</li>
+              <li><strong>PIL/Pillow:</strong> Image processing and dynamic thumbnail generation</li>
+              <li><strong>Custom HTML/CSS:</strong> Interactive overlays with hover effects and zoom functionality</li>
+              <li><strong>Base64 Encoding:</strong> Efficient image transmission to browser</li>
+            </ul>
+
+            <h3>User Workflow</h3>
+            <ol>
+              <li>User navigates to the app and selects a document from the email processing pipeline</li>
+              <li>Original image loads in the main viewer area</li>
+              <li>Two overlay systems display simultaneously:
+                <ol type="a">
+                  <li>OCR blocks overlay showing raw text extraction</li>
+                  <li>Parsed labels overlay showing structured AI extraction</li>
+                </ol>
+              </li>
+              <li>Hovering over any region shows:
+                <ul>
+                  <li>Enlarged label text (16px, bold)</li>
+                  <li>240px wide zoomed thumbnail with context</li>
+                </ul>
+              </li>
+              <li>Sidebar displays complete JSON for programmatic inspection</li>
+            </ol>
+          </section>
+
+          <section>
             <h2>Takeaways</h2>
             <p>This project demonstrates that agentic systems work best when:</p>
             <ul>
@@ -125,6 +174,7 @@
               <li>You're explicit about uncertainty and abstention thresholds</li>
               <li>You validate against ground truth, not just LLM confidence</li>
               <li>You leave room for humans in high-stakes decisions</li>
+              <li>You provide tools for humans to inspect and verify the system's work</li>
             </ul>
           </section>
         </div>
