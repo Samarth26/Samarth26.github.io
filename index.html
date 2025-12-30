@@ -1,4 +1,209 @@
----
-layout: home
-author_profile: true
----
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Samarth Agarwal · Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles/main.css">
+</head>
+<body>
+  <div class="page">
+    <header class="site-header">
+      <div class="brand">Samarth Agarwal</div>
+      <nav class="nav" aria-label="Primary">
+        <a href="#about">About</a>
+        <a href="#projects">Projects</a>
+        <a href="#experience">Experience</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <a class="button ghost" href="https://github.com/Samarth26" target="_blank" rel="noopener">GitHub</a>
+    </header>
+
+    <main>
+      <section class="hero" id="top">
+        <div class="hero__content">
+          <p class="eyebrow">MS Data Science · NYU</p>
+          <h1>Transforming data into impact with ML and AI.</h1>
+          <p class="lede">I build scalable ML pipelines, autonomous systems, and data products. From agentic workflows to self-supervised learning, I focus on practical solutions that drive measurable results.</p>
+          <div class="hero__actions">
+            <a class="button" href="#projects">View projects</a>
+            <a class="button ghost" href="mailto:samarthagarwal26@yahoo.com">Email me</a>
+          </div>
+        </div>
+        <div class="hero__card">
+          <div class="stat">
+            <span class="stat__label">Focus</span>
+            <span class="stat__value">ML · Data Engineering · AI</span>
+          </div>
+          <div class="stat">
+            <span class="stat__label">Toolbox</span>
+            <span class="stat__value">Python · PyTorch · LangChain · Spark · SQL</span>
+          </div>
+          <div class="stat">
+            <span class="stat__label">Graduating</span>
+            <span class="stat__value">May 2026</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="about">
+        <div class="section__header">
+          <p class="eyebrow">About</p>
+          <h2>Data scientist with a systems mindset.</h2>
+          <p class="lede">I design and deploy ML solutions at scale—from agentic workflows to embeddings pipelines. Focused on solving real problems: entity matching, OCR pipelines, autonomous agents, and representation learning.</p>
+        </div>
+        <div class="about-grid">
+          <div class="card">
+            <h3>What I do</h3>
+            <ul>
+              <li>Build end-to-end ML pipelines from data to inference.</li>
+              <li>Optimize for scale: LSH, Spark, batch processing.</li>
+              <li>Ship agentic systems and safety-aware automation.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>How I work</h3>
+            <ul>
+              <li>Validate with rigorous baselines and ablations.</li>
+              <li>Balance accuracy with computational efficiency.</li>
+              <li>Instrument models for observability and debugging.</li>
+            </ul>
+          </div>
+          <div class="card highlight">
+            <h3>Let's collaborate</h3>
+            <p>Looking for ML engineer or data scientist roles? I'm energized by hard technical problems, cross-functional teams, and shipping models to production.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="projects">
+        <div class="section__header">
+          <p class="eyebrow">Recent Projects</p>
+          <h2>ML systems and agentic workflows</h2>
+          <p class="lede">Recent coursework and applied projects demonstrating ML architecture, optimization, and production-grade thinking.</p>
+        </div>
+        <div class="projects-grid">
+          <article class="card project">
+            <div class="project__meta">
+              <span class="pill">LangChain · GPT</span>
+              <span class="pill">OCR</span>
+            </div>
+            <h3>Agentic OCR & Email Automation</h3>
+            <p>Built an end-to-end agentic pipeline for freight document parsing using schema-constrained LLM inference and validation agents.</p>
+            <ul class="project__list">
+              <li>Reduced mislabel rate from 14.2% → 1.8% and CER from 9.5% → 2.5%.</li>
+              <li>Hybrid intent classification with safety-aware abstention: 70% ready-to-send, 8% hallucination, 19% escalation.</li>
+            </ul>
+            <div class="project__links">
+              <a href="https://github.com/Samarth26" target="_blank" rel="noopener">Code</a>
+            </div>
+          </article>
+
+          <article class="card project">
+            <div class="project__meta">
+              <span class="pill">PyTorch</span>
+              <span class="pill">Self-Supervised Learning</span>
+            </div>
+            <h3>Self-Supervised Representation Learning</h3>
+            <p>Trained ResNet-101 from scratch using SimCLR, BYOL, and MoCo on 600k+ unlabeled images.</p>
+            <ul class="project__list">
+              <li>Analyzed convergence and identified MoCo as most stable under limited compute.</li>
+              <li>Achieved 59.9% top-1 accuracy on mini-ImageNet, 34.5% on CUB-200 with frozen encoder.</li>
+            </ul>
+            <div class="project__links">
+              <a href="https://github.com/Samarth26" target="_blank" rel="noopener">Code</a>
+            </div>
+          </article>
+
+          <article class="card project">
+            <div class="project__meta">
+              <span class="pill">PySpark · LSH</span>
+              <span class="pill">Entity Matching</span>
+            </div>
+            <h3>Movie Recommender & Similarity at Scale</h3>
+            <p>Developed Spark-based recommendation engine with ALS matrix factorization and temporal data splits.</p>
+            <ul class="project__list">
+              <li>Implemented MinHashLSH for efficient user–user similarity: reduced candidate sets by 99.999%.</li>
+              <li>Validated with Pearson correlation; identified high-quality "movie twin" pairs.</li>
+            </ul>
+            <div class="project__links">
+              <a href="https://github.com/Samarth26" target="_blank" rel="noopener">Code</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="experience">
+        <div class="section__header">
+          <p class="eyebrow">Experience</p>
+          <h2>Professional & academic background</h2>
+        </div>
+        <div class="timeline">
+          <div class="timeline__item">
+            <div class="pill">Jan–Sep 2025</div>
+            <div>
+              <h3>Graduate Data Intern · Federal Reserve Board</h3>
+              <p>Architected entity matching pipeline across 30M+ records using embeddings and LSH. Slashed candidate sets from 3M to ~10 (99.999% reduction) and enabled end-to-end matching at scale.</p>
+            </div>
+          </div>
+          <div class="timeline__item">
+            <div class="pill">Jun–Aug 2023</div>
+            <div>
+              <h3>Machine Learning Intern · Tata Consultancy Services</h3>
+              <p>Developed marketing chatbot using LangChain, vector stores, and stable diffusion for Banks & Financial Services. Tuned LLM via data collection and prompt engineering for social media creative generation.</p>
+            </div>
+          </div>
+          <div class="timeline__item">
+            <div class="pill">Jun 2022–Jan 2023</div>
+            <div>
+              <h3>Business Analyst Intern · Haleon</h3>
+              <p>Led Innovation Dashboard project with Power BI. Data wrangling and analysis reduced labor costs by 80% and shipped 2 months ahead of schedule (6→4 months).</p>
+            </div>
+          </div>
+          <div class="timeline__item">
+            <div class="pill">Aug 2024–May 2026</div>
+            <div>
+              <h3>Master of Science, Data Science · New York University</h3>
+              <p>Focused coursework: Optimization & Linear Algebra, Machine Learning, Big Data, Deep Learning, NLP.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="contact">
+        <div class="section__header">
+          <p class="eyebrow">Contact</p>
+          <h2>Let's connect</h2>
+          <p class="lede">Interested in ML roles, collaborations, or discussing ML systems? Reach out.</p>
+        </div>
+        <div class="contact">
+          <div>
+            <p class="muted">Email</p>
+            <a href="mailto:samarthagarwal26@yahoo.com">samarthagarwal26@yahoo.com</a>
+          </div>
+          <div>
+            <p class="muted">Phone</p>
+            <a href="tel:+13322509030">(332) 250-9030</a>
+          </div>
+          <div>
+            <p class="muted">GitHub</p>
+            <a href="https://github.com/Samarth26" target="_blank" rel="noopener">github.com/Samarth26</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>© <span id="year"></span> Samarth Agarwal</span>
+      <div class="footer__links">
+        <a href="#top">Back to top</a>
+      </div>
+    </footer>
+  </div>
+
+  <script src="./scripts/main.js"></script>
+</body>
+</html>
