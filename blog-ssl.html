@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Self-Supervised Representation Learning · Samarth Agarwal</title>
+  <title>SSL with ResNet-101 + MoCo · Samarth Agarwal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./styles/main.css">
 </head>
+
 <body>
   <div class="page">
     <header class="site-header">
@@ -26,175 +27,202 @@
       <article class="blog-post">
         <div class="blog-post__header">
           <a href="./index.html#projects" class="back-link">← Back to projects</a>
-          <h1>Self-Supervised Representation Learning</h1>
+          <h1>Self-Supervised Learning with ResNet-101 + MoCo</h1>
           <div class="blog-meta">
-            <span class="pill">PyTorch</span>
             <span class="pill">Self-Supervised Learning</span>
-            <span class="pill">Computer Vision</span>
+            <span class="pill">MoCo · SimCLR · BYOL</span>
+            <span class="pill">ResNet-101</span>
+            <span class="pill">Linear Probe + kNN</span>
           </div>
         </div>
 
         <div class="blog-post__content">
           <section>
             <h2>Overview</h2>
-            <p>Trained ResNet-101 from scratch using three self-supervised learning methods (SimCLR, BYOL, and MoCo) on 600k+ unlabeled images. The goal: understand which SSL algorithm converges fastest and most stably under constrained compute resources.</p>
+            <p>
+              This project studies self-supervised representation learning for image classification using a
+              <strong>ResNet-101 encoder</strong> under realistic compute constraints. I implemented and compared three
+              widely-used SSL frameworks—<strong>SimCLR</strong>, <strong>MoCo</strong>, and <strong>BYOL</strong>—under a unified
+              training and evaluation setup, and measured representation quality using <strong>linear probing</strong> and
+              <strong>k-nearest neighbors (kNN)</strong> across multiple datasets. :contentReference[oaicite:1]{index=1}
+            </p>
+            <p>
+              A key finding was that representation quality improves rapidly early in training and then
+              <strong>saturates around ~50 epochs</strong>, with diminishing returns beyond that point. :contentReference[oaicite:2]{index=2}
+            </p>
           </section>
 
           <section>
             <h2>Motivation</h2>
-            <p>Self-supervised learning is powerful—it learns meaningful representations without labels. But in practice:</p>
-            <ul>
-              <li>Different SSL algorithms have different convergence properties</li>
-              <li>Compute constraints force trade-offs between method sophistication and training time</li>
-              <li>Transfer performance on downstream tasks matters more than pretraining accuracy</li>
-            </ul>
+            <p>
+              Image classification typically relies on large labeled datasets, which can be expensive or infeasible to obtain.
+              Self-supervised learning addresses this by learning useful visual representations directly from unlabeled images.
+              However, many recent SSL methods require very large backbones, huge datasets, and long training schedules.
+              In this work, I focused on a strong but tractable backbone—<strong>ResNet-101</strong>—and explored practical
+              SSL training under limited GPU resources and a short development timeline. :contentReference[oaicite:3]{index=3}
+            </p>
           </section>
 
           <section>
-            <h2>Methods Compared</h2>
-            
-            <h3>SimCLR (Simple Contrastive Learning)</h3>
-            <p><strong>Approach:</strong> Maximizes agreement between augmented views of the same image using contrastive loss.</p>
+            <h2>Methodology</h2>
+
+            <h3>Two-stage SSL pipeline</h3>
+            <p>
+              The training follows a standard two-stage SSL workflow:
+              (1) pretrain an encoder on unlabeled data using an SSL objective, then
+              (2) freeze the encoder and evaluate learned representations using linear probing or kNN classification. :contentReference[oaicite:4]{index=4}
+            </p>
+
+            <h3>Augmentations</h3>
+            <p>
+              All methods share a SimCLR-style augmentation pipeline. Images are resized to <strong>96×96</strong>, and two
+              independent “global views” are created using random resized crops, horizontal flip, color jitter, grayscale conversion,
+              and Gaussian blur. :contentReference[oaicite:5]{index=5}
+            </p>
+            <p>
+              I also explored an optional <strong>local-crop augmentation</strong> to emphasize fine-grained structure and
+              encourage multi-scale consistency; this was implemented with GPU-accelerated Kornia to avoid CPU bottlenecks. :contentReference[oaicite:6]{index=6}
+            </p>
+
+            <h3>Architecture</h3>
+            <p>
+              The backbone is <strong>ResNet-101</strong> with the classification head removed. A 2-layer MLP projection head
+              maps encoder outputs into the embedding space used by the SSL objective; projection dimensionality is treated as a tunable
+              hyperparameter shared across methods. :contentReference[oaicite:7]{index=7}
+            </p>
+
+            <h3>SSL objectives compared</h3>
             <ul>
-              <li>Pro: Simple, interpretable, well-studied</li>
-              <li>Con: Large batch sizes required for good contrastive negatives</li>
+              <li>
+                <strong>SimCLR:</strong> contrastive learning using in-batch negatives; performance is sensitive to batch size
+                because negatives come from the minibatch. :contentReference[oaicite:8]{index=8}
+              </li>
+              <li>
+                <strong>MoCo:</strong> contrastive learning with a momentum-updated key encoder and a queue of negatives,
+                reducing dependence on large batch sizes. :contentReference[oaicite:9]{index=9}
+              </li>
+              <li>
+                <strong>BYOL:</strong> bootstrap learning without explicit negatives; uses online/target networks with EMA updates
+                and a predictor head to avoid collapse. :contentReference[oaicite:10]{index=10}
+              </li>
             </ul>
 
-            <h3>BYOL (Bootstrap Your Own Latent)</h3>
-            <p><strong>Approach:</strong> No explicit negative samples—uses momentum encoder and prediction head.</p>
-            <ul>
-              <li>Pro: Smaller batch requirements, stable training</li>
-              <li>Con: Less intuitive, can be prone to collapse without careful tuning</li>
-            </ul>
-
-            <h3>MoCo (Momentum Contrast)</h3>
-            <p><strong>Approach:</strong> Maintains a queue of negative samples, momentum-updated encoder.</p>
-            <ul>
-              <li>Pro: Best of both worlds—stable with reasonable batch sizes</li>
-              <li>Con: More hyperparameters to tune</li>
-            </ul>
+            <h3>Training & evaluation</h3>
+            <p>
+              SimCLR and MoCo were trained with Adam + cosine annealing; BYOL used SGD with momentum. Mixed precision was enabled.
+              Performance was evaluated using both linear probing and kNN to measure representation quality without fine-tuning the backbone. :contentReference[oaicite:11]{index=11}
+            </p>
           </section>
 
           <section>
-            <h2>Experimental Setup</h2>
+            <h2>Experimental Journey</h2>
+            <p>
+              The project evolved iteratively. I started with <strong>ResNet-50</strong> and focused on kNN evaluation on the
+              fine-grained CUB-200 dataset. Early experiments used SimCLR and BYOL; adding ~200k iNaturalist images improved
+              visual diversity and gave modest gains. Introducing local crops improved kNN performance further (≈15% on CUB-200),
+              motivating deeper scaling and more stable objectives. :contentReference[oaicite:12]{index=12}
+            </p>
+
+            <p>
+              Next, I transitioned to <strong>MoCo</strong> after observing better stability. I scaled from ResNet-50 → Wide ResNet-50
+              → <strong>ResNet-101</strong>, with ResNet-101 achieving the strongest performance. To improve generalization, I expanded
+              pretraining with ~600k CC12M images, which helped particularly on Mini-ImageNet and SUN. :contentReference[oaicite:13]{index=13}
+            </p>
+          </section>
+
+          <section>
+            <h2>Training Dynamics</h2>
+            <p>
+              Different SSL methods showed noticeably different optimization behavior:
+            </p>
             <ul>
-              <li><strong>Dataset:</strong> 600k+ unlabeled images (ImageNet + additional data)</li>
-              <li><strong>Architecture:</strong> ResNet-101 backbone</li>
-              <li><strong>Training:</strong> 800 epochs (aggressive schedule to match compute constraints)</li>
-              <li><strong>Downstream Eval:</strong> Linear evaluation on mini-ImageNet (1000 images per class) and CUB-200 (bird classification, fine-grained)</li>
+              <li>
+                <strong>SimCLR:</strong> loss dropped quickly and saturated early (~0.12), then oscillated without corresponding
+                downstream gains. :contentReference[oaicite:14]{index=14}
+              </li>
+              <li>
+                <strong>BYOL:</strong> exhibited less stable training, with loss not clearly stabilizing across runs. :contentReference[oaicite:15]{index=15}
+              </li>
+              <li>
+                <strong>MoCo:</strong> showed the most consistent behavior—loss fell rapidly then gradually decreased, though downstream
+                improvements still saturated even as loss kept dropping. :contentReference[oaicite:16]{index=16}
+              </li>
             </ul>
+            <p>
+              The big takeaway: <strong>loss convergence isn’t a guarantee of continued representation gains</strong>—you need to track
+              downstream metrics (kNN/linear probe) to detect diminishing returns. :contentReference[oaicite:17]{index=17}
+            </p>
           </section>
 
           <section>
             <h2>Results</h2>
-            
-            <h3>Training Convergence</h3>
+
+            <h3>Early improvement, then saturation</h3>
+            <p>
+              Across datasets, both kNN and linear probing improved quickly in the first 20–40 epochs and stabilized around
+              <strong>~50 epochs</strong>. kNN used <strong>k=20</strong> and was evaluated every 5 epochs; linear probing was evaluated every 10 epochs. :contentReference[oaicite:18]{index=18}
+            </p>
+
+            <h3>Final configuration (Leaderboard setup)</h3>
+            <p>
+              For the final submission, I pretrained <strong>ResNet-101</strong> for <strong>100 epochs</strong> using the expanded pretraining
+              dataset. I then froze the encoder and trained a linear probe for <strong>30 epochs</strong>.
+              A small grid search found the best linear-probe hyperparameters at <strong>LR = 1e-2</strong> and <strong>weight decay = 0</strong>.
+              Compared to defaults, tuning and longer probe training improved results by ~5–15% across datasets. :contentReference[oaicite:19]{index=19}
+            </p>
+
             <table class="results-table">
               <tr>
-                <th>Method</th>
-                <th>Convergence Speed</th>
-                <th>Stability</th>
-                <th>Final Loss</th>
+                <th>Dataset (Leaderboard Part)</th>
+                <th>Public</th>
+                <th>Private</th>
               </tr>
               <tr>
-                <td>SimCLR</td>
-                <td>Moderate</td>
-                <td>Stable</td>
-                <td>0.42</td>
+                <td>Part 1 (Dataset 1)</td>
+                <td>34.46%</td>
+                <td>31.26%</td>
               </tr>
               <tr>
-                <td>BYOL</td>
-                <td>Fast</td>
-                <td>Variable</td>
-                <td>0.38</td>
+                <td>Part 2 (Dataset 2)</td>
+                <td>59.93%</td>
+                <td>62.05%</td>
               </tr>
               <tr>
-                <td>MoCo</td>
-                <td>Moderate</td>
-                <td>Most Stable</td>
-                <td>0.35</td>
+                <td>Part 3 (Dataset 3)</td>
+                <td>33.58%</td>
+                <td>33.24%</td>
               </tr>
             </table>
-
-            <h3>Transfer Performance (Frozen Encoder)</h3>
-            <table class="results-table">
-              <tr>
-                <th>Method</th>
-                <th>mini-ImageNet (Top-1)</th>
-                <th>CUB-200 (Top-1)</th>
-              </tr>
-              <tr>
-                <td>SimCLR</td>
-                <td>58.2%</td>
-                <td>32.1%</td>
-              </tr>
-              <tr>
-                <td>BYOL</td>
-                <td>57.8%</td>
-                <td>31.9%</td>
-              </tr>
-              <tr>
-                <td>MoCo</td>
-                <td>59.9%</td>
-                <td>34.5%</td>
-              </tr>
-            </table>
-
-            <p><strong>Key Finding:</strong> MoCo achieved best transfer performance and most stable training—the momentum-based negative queue elegantly balances stability with efficiency.</p>
+            <p>
+              <strong>Best-performing approach:</strong> momentum-based contrastive learning (MoCo) + backbone scaling to ResNet-101,
+              paired with data diversity/scale improvements. :contentReference[oaicite:20]{index=20}
+            </p>
           </section>
 
           <section>
-            <h2>Technical Details</h2>
-            
-            <h3>Data Augmentation Pipeline</h3>
-            <p>Critical to SSL success. Used:</p>
+            <h2>Key Takeaways</h2>
             <ul>
-              <li>Random crops (70-100% of image)</li>
-              <li>Color jittering, Gaussian blur</li>
-              <li>Random flips</li>
-            </ul>
-
-            <h3>Hyperparameter Tuning</h3>
-            <ul>
-              <li>Learning rate: 0.03 (scaled by batch size)</li>
-              <li>Batch size: 256</li>
-              <li>Temperature (τ): 0.07 for SimCLR, 0.07 for MoCo</li>
-              <li>Momentum coefficient (μ): 0.999 for MoCo and BYOL</li>
-            </ul>
-
-            <h3>Ablation: Impact of Queue Size (MoCo)</h3>
-            <p>Queue size affects negative sample diversity:</p>
-            <ul>
-              <li>Queue size 4096: Fast but unstable (loss jumps)</li>
-              <li>Queue size 65536: Sweet spot—balanced convergence</li>
-              <li>Queue size 262144: Better final accuracy but slower convergence</li>
+              <li><strong>MoCo was the most stable</strong> under constrained compute compared to SimCLR and BYOL. :contentReference[oaicite:21]{index=21}</li>
+              <li><strong>Data diversity and scale helped</strong>: adding iNaturalist and CC12M improved downstream performance. :contentReference[oaicite:22]{index=22}</li>
+              <li><strong>Multi-scale augmentations matter</strong>: local crops improved representation quality in early stages. :contentReference[oaicite:23]{index=23}</li>
+              <li><strong>Stop at the knee</strong>: performance saturates around ~50 epochs—track downstream metrics, not just loss. :contentReference[oaicite:24]{index=24}</li>
+              <li><strong>Linear-probe tuning is underrated</strong>: small grid search + longer probe improved results across datasets. :contentReference[oaicite:25]{index=25}</li>
             </ul>
           </section>
 
           <section>
-            <h2>Why MoCo Won for This Task</h2>
-            <ul>
-              <li><strong>Compute Efficiency:</strong> Momentum queue reduces memory overhead vs maintaining full negative sample matrix</li>
-              <li><strong>Stability:</strong> Momentum-updated encoder smooths training dynamics; fewer training instabilities</li>
-              <li><strong>Better Transfer:</strong> Frozen encoder evaluation on fine-grained tasks (CUB-200) showed MoCo's learned representations captured richer visual features</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2>Lessons Learned</h2>
-            <ul>
-              <li>SSL isn't one-size-fits-all: task and compute constraints matter</li>
-              <li>Transfer learning evaluation on diverse downstream tasks (generic vs fine-grained) reveals method robustness</li>
-              <li>Momentum mechanisms are underrated—they smooth optimization in ways explicit methods can't</li>
-              <li>Ablations on queue size/batch size teach more than final numbers alone</li>
-            </ul>
+            <h2>Links</h2>
+            <p>
+              <strong>Repo:</strong> <a href="https://github.com/Samarth26/Image-SSL" target="_blank" rel="noopener">GitHub</a><br>
+              <strong>Report:</strong> <a href="./ssl-report.pdf" target="_blank" rel="noopener">PDF</a>
+            </p>
           </section>
         </div>
 
         <div class="blog-nav">
-          <a href="./blog-recommender.html" class="blog-nav__link">← Previous: Movie Recommender</a>
+          <a href="./blog-freight.html" class="blog-nav__link">← Previous: Agentic OCR & Email Automation</a>
           <a href="./index.html#projects" class="blog-nav__link">All Projects</a>
-          <a href="./blog-ocr.html" class="blog-nav__link">Next: Agentic OCR →</a>
+          <a href="./blog-recommender.html" class="blog-nav__link">Next: Movie Recommender →</a>
         </div>
       </article>
     </main>
@@ -208,5 +236,10 @@
   </div>
 
   <script src="./scripts/main.js"></script>
+  <script>
+    // If your main.js already sets this, you can remove this block.
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
