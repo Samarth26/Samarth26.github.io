@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brightspace RAG Helper · Samarth Agarwal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles/main.css">
+</head>
+
+<body>
+  <div class="page">
+    <header class="site-header">
+      <div class="brand">Samarth Agarwal</div>
+      <nav class="nav" aria-label="Primary">
+        <a href="./index.html#about">About</a>
+        <a href="./index.html#projects">Projects</a>
+        <a href="./index.html#experience">Experience</a>
+        <a href="./index.html#contact">Contact</a>
+      </nav>
+      <a class="button ghost" href="https://github.com/Samarth26" target="_blank" rel="noopener">GitHub</a>
+    </header>
+
+    <main>
+      <article class="blog-post">
+        <div class="blog-post__header">
+          <a href="./index.html#projects" class="back-link">← Back to projects</a>
+          <h1>Brightspace RAG Helper</h1>
+          <div class="blog-meta">
+            <span class="pill">Edge AI</span>
+            <span class="pill">RAG</span>
+            <span class="pill">Small LLMs</span>
+            <span class="pill">Chrome Extension</span>
+          </div>
+        </div>
+
+        <div class="blog-post__content">
+          <section>
+            <h2>Overview</h2>
+            <p>
+              Managing course materials often involves endlessly downloading PDF slides, assignments, and readings, then manually searching through them to find specific information.
+              I am building a <strong>Retrieval-Augmented Generation (RAG)</strong> solution using <strong>Small LLMs</strong> that allows students to efficiently retrieve course information and generate notes without the manual hassle.
+            </p>
+            <p>
+               The core concept is simple: <strong>Drag and drop</strong> your course files, and the RAG engine immediately indexes them. You can then ask questions, and the LLM generates answers backed by the specific content in your files.
+            </p>
+          </section>
+
+          <section>
+            <h2>The Workflow</h2>
+            <p>
+              The solution is designed for friction-free access to knowledge. Instead of navigating complex folder structures or re-downloading files:
+            </p>
+            <ul>
+              <li><strong>Drag & Drop Interface:</strong> Users simply drag their course documents (PDFs, PPTs, DOCX) into the application.</li>
+              <li><strong>Google Drive Integration:</strong> Files can be saved to and retrieved directly from Google Drive, eliminating the need to keep local copies or repeatedly download materials from the learning management system.</li>
+              <li><strong>Instant Retrieval:</strong> The RAG system efficiently retrieves relevant chunks of information from the indexed documents to answer student queries in real-time.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Edge AI & Privacy</h2>
+            <p>
+              This is an <strong>Edge AI solution</strong>. By utilizing Small LLMs (like Llama-7B via local inference or optimized quantized models), the goal is to keep processing efficiently on the client side or with minimal latency.
+            </p>
+            <p>
+              Processing data locally or "at the edge" ensures that sensitive course data and personal notes remain private and secure, while also reducing the costs associated with large cloud-based model inference.
+            </p>
+          </section>
+
+          <section>
+            <h2>Future Roadmap: Agentic Workflows</h2>
+            <p>
+              While the current version relies on user-initiated drag-and-drop or Drive integration, the future roadmap involves significant <strong>agentic automation</strong>.
+            </p>
+            <p>
+              I will be adding agents capable of:
+            </p>
+            <ul>
+              <li><strong>Direct Brightspace Integration:</strong> The model will autonomously "look" at files on Brightspace, identifying new materials as they are posted.</li>
+              <li><strong>Auto-Ingestion:</strong> Agents will pick up these files, index them, and update the knowledge base without any user intervention.</li>
+              <li><strong>Proactive Summarization:</strong> Generating weekly summaries or study guides automatically as new content becomes available.</li>
+            </ul>
+          </section>
+
+          <section>
+             <h2>Links</h2>
+             <p>
+               Check out the code and progress on GitHub:
+             </p>
+             <div class="project__links">
+                <a href="https://github.com/Samarth26/brightspace_helper" target="_blank" rel="noopener">View on GitHub</a>
+             </div>
+          </section>
+
+        </div>
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-content">
+        <div class="footer-col">
+          <p class="brand">Samarth Agarwal</p>
+          <p class="muted">Building systems that reason.</p>
+        </div>
+        <div class="footer-col" style="align-items: flex-end;">
+          <div class="social-links">
+            <a href="https://github.com/Samarth26" target="_blank" rel="noopener">GitHub</a>
+            <a href="https://www.linkedin.com" target="_blank" rel="noopener">LinkedIn</a>
+            <a href="mailto:samarthagarwal26@yahoo.com">Email</a>
+          </div>
+          <p class="muted" style="margin-top: 1rem;">© 2026</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
