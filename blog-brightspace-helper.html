@@ -41,7 +41,7 @@
             <h2>Overview</h2>
             <p>
               Managing course materials often involves endlessly downloading PDF slides, assignments, and readings, then manually searching through them to find specific information.
-              I am building a <strong>Retrieval-Augmented Generation (RAG)</strong> solution using <strong>Small Language Models</strong> that allows students to efficiently retrieve course information and generate notes without the manual hassle.
+              I am building a <strong>Retrieval-Augmented Generation (RAG)</strong> solution powerd by <strong>Google's Gemma 2 2B</strong> for inference and <strong>Qwen 3</strong> for embeddings. This allows students to efficiently retrieve course information and generate notes without the manual hassle.
             </p>
             <p>
                The core concept is simple: <strong>Drag and drop</strong> your course files, and the RAG engine immediately indexes them. You can then ask questions, and the LLM generates answers backed by the specific content in your files.
@@ -51,22 +51,28 @@
           <section>
             <h2>The Workflow</h2>
             <p>
-              The solution is designed for friction-free access to knowledge. Instead of navigating complex folder structures or re-downloading files:
+              The solution offers scalable storage options designed for efficiency:
             </p>
             <ul>
               <li><strong>Drag & Drop Interface:</strong> Users simply drag their course documents (PDFs, PPTs, DOCX) into the application.</li>
-              <li><strong>Google Drive Integration:</strong> Files can be saved to and retrieved directly from Google Drive, eliminating the need to keep local copies or repeatedly download materials from the learning management system.</li>
-              <li><strong>Instant Retrieval:</strong> The RAG system efficiently retrieves relevant chunks of information from the indexed documents to answer student queries in real-time.</li>
+              <li><strong>Google Drive Integration:</strong> For seamless access, users can link their Google Drive accounts to import course materials directly.</li>
+              <li><strong>MongoDB Atlas Integration:</strong> For scalability, the system supports a <strong>Vector API</strong> backed by MongoDB Atlas, enabling faster retrieval over larger document sets.</li>
+              <li><strong>Instant Retrieval:</strong> The RAG system retrieves the top relevant chunks (default: 8 chunks) to answer student queries in real-time.</li>
             </ul>
+
+            <figure>
+              <img src="./assets/lms_workflow.png" alt="LMS Workflow diagram" style="width:100%;border-radius:12px;">
+              <figcaption>LMS RAG Workflow</figcaption>
+            </figure>
           </section>
 
           <section>
             <h2>Edge AI & Privacy</h2>
             <p>
-              This is an <strong>Edge AI solution</strong>. By utilizing Small Language Models (like Llama-7B via local inference or optimized quantized models), the goal is to keep processing efficiently on the client side or with minimal latency.
+              This is an <strong>Edge AI solution</strong> focused on privacy. Users can choose between cloud-based inference via Hugging Face or complete local execution.
             </p>
             <p>
-              Processing data locally or "at the edge" ensures that sensitive course data and personal notes remain private and secure, while also reducing the costs associated with large cloud-based model inference.
+              For maximum privacy, the tool supports <strong>Ollama</strong> integration. This allows you to run models like <strong>Llama 3.2 3B</strong> entirely on your own device, ensuring that your course notes and files never leave your machine.
             </p>
           </section>
 
