@@ -44,11 +44,11 @@
               <strong>ResNet-101 encoder</strong> under realistic compute constraints. I implemented and compared three
               widely-used SSL frameworks—<strong>SimCLR</strong>, <strong>MoCo</strong>, and <strong>BYOL</strong>—under a unified
               training and evaluation setup, and measured representation quality using <strong>linear probing</strong> and
-              <strong>k-nearest neighbors (kNN)</strong> across multiple datasets. :contentReference[oaicite:1]{index=1}
+              <strong>k-nearest neighbors (kNN)</strong> across multiple datasets.
             </p>
             <p>
               A key finding was that representation quality improves rapidly early in training and then
-              <strong>saturates around ~50 epochs</strong>, with diminishing returns beyond that point. :contentReference[oaicite:2]{index=2}
+              <strong>saturates around ~50 epochs</strong>, with diminishing returns beyond that point.
             </p>
           </section>
 
@@ -59,7 +59,7 @@
               Self-supervised learning addresses this by learning useful visual representations directly from unlabeled images.
               However, many recent SSL methods require very large backbones, huge datasets, and long training schedules.
               In this work, I focused on a strong but tractable backbone—<strong>ResNet-101</strong>—and explored practical
-              SSL training under limited GPU resources and a short development timeline. :contentReference[oaicite:3]{index=3}
+              SSL training under limited GPU resources and a short development timeline.
             </p>
           </section>
 
@@ -70,47 +70,47 @@
             <p>
               The training follows a standard two-stage SSL workflow:
               (1) pretrain an encoder on unlabeled data using an SSL objective, then
-              (2) freeze the encoder and evaluate learned representations using linear probing or kNN classification. :contentReference[oaicite:4]{index=4}
+              (2) freeze the encoder and evaluate learned representations using linear probing or kNN classification.
             </p>
 
             <h3>Augmentations</h3>
             <p>
               All methods share a SimCLR-style augmentation pipeline. Images are resized to <strong>96×96</strong>, and two
               independent “global views” are created using random resized crops, horizontal flip, color jitter, grayscale conversion,
-              and Gaussian blur. :contentReference[oaicite:5]{index=5}
+              and Gaussian blur.
             </p>
             <p>
               I also explored an optional <strong>local-crop augmentation</strong> to emphasize fine-grained structure and
-              encourage multi-scale consistency; this was implemented with GPU-accelerated Kornia to avoid CPU bottlenecks. :contentReference[oaicite:6]{index=6}
+              encourage multi-scale consistency; this was implemented with GPU-accelerated Kornia to avoid CPU bottlenecks.
             </p>
 
             <h3>Architecture</h3>
             <p>
               The backbone is <strong>ResNet-101</strong> with the classification head removed. A 2-layer MLP projection head
               maps encoder outputs into the embedding space used by the SSL objective; projection dimensionality is treated as a tunable
-              hyperparameter shared across methods. :contentReference[oaicite:7]{index=7}
+              hyperparameter shared across methods.
             </p>
 
             <h3>SSL objectives compared</h3>
             <ul>
               <li>
                 <strong>SimCLR:</strong> contrastive learning using in-batch negatives; performance is sensitive to batch size
-                because negatives come from the minibatch. :contentReference[oaicite:8]{index=8}
+                because negatives come from the minibatch.
               </li>
               <li>
                 <strong>MoCo:</strong> contrastive learning with a momentum-updated key encoder and a queue of negatives,
-                reducing dependence on large batch sizes. :contentReference[oaicite:9]{index=9}
+                reducing dependence on large batch sizes.
               </li>
               <li>
                 <strong>BYOL:</strong> bootstrap learning without explicit negatives; uses online/target networks with EMA updates
-                and a predictor head to avoid collapse. :contentReference[oaicite:10]{index=10}
+                and a predictor head to avoid collapse.
               </li>
             </ul>
 
             <h3>Training & evaluation</h3>
             <p>
               SimCLR and MoCo were trained with Adam + cosine annealing; BYOL used SGD with momentum. Mixed precision was enabled.
-              Performance was evaluated using both linear probing and kNN to measure representation quality without fine-tuning the backbone. :contentReference[oaicite:11]{index=11}
+              Performance was evaluated using both linear probing and kNN to measure representation quality without fine-tuning the backbone.
             </p>
           </section>
 
@@ -120,13 +120,13 @@
               The project evolved iteratively. I started with <strong>ResNet-50</strong> and focused on kNN evaluation on the
               fine-grained CUB-200 dataset. Early experiments used SimCLR and BYOL; adding ~200k iNaturalist images improved
               visual diversity and gave modest gains. Introducing local crops improved kNN performance further (≈15% on CUB-200),
-              motivating deeper scaling and more stable objectives. :contentReference[oaicite:12]{index=12}
+              motivating deeper scaling and more stable objectives.
             </p>
 
             <p>
               Next, I transitioned to <strong>MoCo</strong> after observing better stability. I scaled from ResNet-50 → Wide ResNet-50
               → <strong>ResNet-101</strong>, with ResNet-101 achieving the strongest performance. To improve generalization, I expanded
-              pretraining with ~600k CC12M images, which helped particularly on Mini-ImageNet and SUN. :contentReference[oaicite:13]{index=13}
+              pretraining with ~600k CC12M images, which helped particularly on Mini-ImageNet and SUN.
             </p>
           </section>
 
@@ -138,19 +138,19 @@
             <ul>
               <li>
                 <strong>SimCLR:</strong> loss dropped quickly and saturated early (~0.12), then oscillated without corresponding
-                downstream gains. :contentReference[oaicite:14]{index=14}
+                downstream gains.
               </li>
               <li>
-                <strong>BYOL:</strong> exhibited less stable training, with loss not clearly stabilizing across runs. :contentReference[oaicite:15]{index=15}
+                <strong>BYOL:</strong> exhibited less stable training, with loss not clearly stabilizing across runs.
               </li>
               <li>
                 <strong>MoCo:</strong> showed the most consistent behavior—loss fell rapidly then gradually decreased, though downstream
-                improvements still saturated even as loss kept dropping. :contentReference[oaicite:16]{index=16}
+                improvements still saturated even as loss kept dropping.
               </li>
             </ul>
             <p>
               The big takeaway: <strong>loss convergence isn’t a guarantee of continued representation gains</strong>—you need to track
-              downstream metrics (kNN/linear probe) to detect diminishing returns. :contentReference[oaicite:17]{index=17}
+              downstream metrics (kNN/linear probe) to detect diminishing returns.
             </p>
           </section>
 
@@ -160,7 +160,7 @@
             <h3>Early improvement, then saturation</h3>
             <p>
               Across datasets, both kNN and linear probing improved quickly in the first 20–40 epochs and stabilized around
-              <strong>~50 epochs</strong>. kNN used <strong>k=20</strong> and was evaluated every 5 epochs; linear probing was evaluated every 10 epochs. :contentReference[oaicite:18]{index=18}
+              <strong>~50 epochs</strong>. kNN used <strong>k=20</strong> and was evaluated every 5 epochs; linear probing was evaluated every 10 epochs.
             </p>
 
             <h3>Final configuration (Leaderboard setup)</h3>
@@ -168,7 +168,7 @@
               For the final submission, I pretrained <strong>ResNet-101</strong> for <strong>100 epochs</strong> using the expanded pretraining
               dataset. I then froze the encoder and trained a linear probe for <strong>30 epochs</strong>.
               A small grid search found the best linear-probe hyperparameters at <strong>LR = 1e-2</strong> and <strong>weight decay = 0</strong>.
-              Compared to defaults, tuning and longer probe training improved results by ~5–15% across datasets. :contentReference[oaicite:19]{index=19}
+              Compared to defaults, tuning and longer probe training improved results by ~5–15% across datasets.
             </p>
 
             <table class="results-table">
@@ -195,18 +195,18 @@
             </table>
             <p>
               <strong>Best-performing approach:</strong> momentum-based contrastive learning (MoCo) + backbone scaling to ResNet-101,
-              paired with data diversity/scale improvements. :contentReference[oaicite:20]{index=20}
+              paired with data diversity/scale improvements.
             </p>
           </section>
 
           <section>
             <h2>Key Takeaways</h2>
             <ul>
-              <li><strong>MoCo was the most stable</strong> under constrained compute compared to SimCLR and BYOL. :contentReference[oaicite:21]{index=21}</li>
-              <li><strong>Data diversity and scale helped</strong>: adding iNaturalist and CC12M improved downstream performance. :contentReference[oaicite:22]{index=22}</li>
-              <li><strong>Multi-scale augmentations matter</strong>: local crops improved representation quality in early stages. :contentReference[oaicite:23]{index=23}</li>
-              <li><strong>Stop at the knee</strong>: performance saturates around ~50 epochs—track downstream metrics, not just loss. :contentReference[oaicite:24]{index=24}</li>
-              <li><strong>Linear-probe tuning is underrated</strong>: small grid search + longer probe improved results across datasets. :contentReference[oaicite:25]{index=25}</li>
+              <li><strong>MoCo was the most stable</strong> under constrained compute compared to SimCLR and BYOL.</li>
+              <li><strong>Data diversity and scale helped</strong>: adding iNaturalist and CC12M improved downstream performance.</li>
+              <li><strong>Multi-scale augmentations matter</strong>: local crops improved representation quality in early stages.</li>
+              <li><strong>Stop at the knee</strong>: performance saturates around ~50 epochs—track downstream metrics, not just loss.</li>
+              <li><strong>Linear-probe tuning is underrated</strong>: small grid search + longer probe improved results across datasets.</li>
             </ul>
           </section>
 
